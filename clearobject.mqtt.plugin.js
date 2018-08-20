@@ -118,6 +118,19 @@
       });
     };
 
+    function parse_topic(message){
+        var topics = message.destinationName.split('/')
+        data = {};
+        topic = '';
+        end_bra = '';
+        topics.forEach(function(e){
+          topic += '{"'+e+'":';
+          end_bra += '}';
+        })
+        data = JSON.parse(topic+message.payloadString+end_bra);
+        return data;
+    }
+
     function onMessageArrived(message) {
       var device = message.destinationName.split('/')[4];
       var msg = "";
@@ -127,6 +140,9 @@
         msg = message.payloadString;
       }
       data[device] = msg;
+      if (!(currentSettings.json_data)) {
+          data = parse_topic(message);
+      }
       updateCallback(data);
     };
 
